@@ -1,0 +1,66 @@
+---
+title: "Exercises Data Science with R"
+output: html_notebook
+author: "Thomas Kirschstein"
+---
+
+# Chapter 1
+
+There are quite a lot standard basic mathematical functions. Try to google for R cheat sheets if you are interested in a comprehensive overview.
+
+```{r, exe1, echo=T, include=T, collapse=TRUE}
+3^2     #1
+sqrt(9) #2
+9^.5
+pi^2    #3
+(abs(3^2-4^2))^.5 #4
+log(exp(4), base = exp(1)) #5
+log(exp(4))
+log(100, base = 10) #6
+log10(100) 
+factorial(8) #7
+exp(factorial(3)) #8
+```
+
+# Chapter 2
+
+1. Formulate the EOQ formula in R
+```{r, exe2-1,  echo=T, include=T, collapse=TRUE}
+cost_eoq_fun <- function(q, d, co, cl) {
+  # returns total cost per period
+  # d...demand
+  # q...lot size
+  # co...ordering cost
+  # cl...stock holding cost
+  ((1/2)*cl*q)+((d/q)*co)
+}
+
+eoq_fun <- function(co, d, cl) {
+  # return optimal lot size
+  # d...demand
+  # co...ordering cost
+  # cl...stock holding cost
+  sqrt((2*co*d)/cl)
+}
+```
+
+2. Derive a function for calculating weighted Euclidean distance between two points.
+```{r, exe2-2,  echo=T, include=T, collapse=TRUE}
+weuc_d2_func <- function(x,y,w) {
+  # calculates weighted Euclidean distance between x and y
+  # y,x...vectors
+  # w.. weight vector
+  sqrt(sum(w*(x-y)^2))
+}
+
+```
+
+3. Formulate a function for the Geometric Poisson density distribution.
+```{r, exe2-3,  echo=T, include=T, collapse=TRUE}
+pois_fun <- function(n, theta, lambda) {
+  # calculates density of Geometric Poisson distribution
+  # n...frequency
+  # lambda, theta...parameters
+  sum(exp(-lambda)*lambda^(1:n)/factorial(1:n)*(1-theta)^(n-1:n)*choose(n-1,0:(n-1)))
+}
+```
