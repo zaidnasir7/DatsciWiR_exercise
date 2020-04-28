@@ -5,6 +5,9 @@ output:
   pdf_document: default
   html_document:
     df_print: paged
+    toc: yes
+    toc_float: true
+    number_sections: false
 ---
 
 # Chapter 1
@@ -167,7 +170,6 @@ rowMeans(A.prime)
 
 # Chapter 4
 
-
 1. Construct a list with 100 entries. Afterwards, display only entries with odd indices.
 ```{r, exe4-1,  echo=T, include=T, collapse=TRUE}
 x <- sample(x = 1:100, size = 100)
@@ -190,7 +192,7 @@ A <- matrix(sample(x = 1:100, 36), ncol = 6)
 which(A <= 50)
 ```
 
-4.Formulate a function for calculating the moving average over a vector.
+4. Formulate a function for calculating the moving average over a vector.
 
 ```{r, exe4-4,  echo=T, include=T, collapse=TRUE}
 ma_fun <- function(x, n){
@@ -204,7 +206,119 @@ ma_fun(x = 1:10 , n=4)
 ```
 
 
+# Chapter 5
+
+1. Sample 100 observations in the range $[-3,3]$ from the follwing model and plot the sample:
+$$ y = \sin(3 \cdot x^2 - 4) \cdot x + 0.5 \cdot x + \epsilon $$ whereby $\epsilon \sim N(0,0.5)$.
+Can you estimate a regression function?
+
+```{r, exe5-1,  echo=T, include=T, collapse=TRUE}
+n <- 100                                # number of points to plot
+x <- runif(n, min=-3, max=3)            # 100 x coordinates
+y <- sin(3 * x^2 - 4) * x + 0.5 * x + rnorm(n, mean = 0, sd = sqrt(.5)) 
+plot(x[order(x)], y[order(x)], xlab ="x", ylab = "y", pch = 16)
+lin.reg <- lm(y~x)                      # fit a linear regression model
+abline(lin.reg, col = "red", lwd =2)    # ... and plot the regression line
+```
+
+2. Plot the EOQ model in an appropriate range.
+
+```{r, exe5-2,  echo=T, include=T, collapse=TRUE}
+q.vec <- seq(265, 365, length.out = 100)
+y.vec <- cost_eoq_fun(q = q.vec , d = 100, cl = .1, co = 50)
+plot(q.vec, y.vec, xlab ="lot size q", ylab = "total cost", type = "l", lwd =2)
+abline(v = eoq_fun(d = 100, cl = .1, co = 50), col="darkgrey", lwd=2, lty=2)
+```
+
+3. Plot the newsvendor model in an appropriate range.
+
+The total cost in the normal newsvendor model is given by
+$$ Z(q) = \left(c_u + c_o \right) \cdot \sigma \cdot \left( \varphi(q') + q' \cdot \Phi(q') \right) - c_u \cdot (q-\mu) $$ 
+with $q' = \frac{q-\mu}{\sigma}$
+
+```{r, exe5-3,  echo=T, include=T, collapse=TRUE}
+newsven_obj_fun <- function(x, cu, co, mu, sigma){
+      q.prime <- (x-mu)/sigma
+	     (cu + co) * sigma * (dnorm(q.prime) + q.prime * pnorm(q.prime)) - cu * sigma * q.prime
+}
+q.vec <- seq(110, 125, length.out = 100)
+cost.vec <- newsven_obj_fun(x = q.vec , mu = 100, cu = 2, co = 0.5, sigma = 20)
+plot(q.vec, cost.vec, xlab ="lot size q", ylab = "total cost", type = "l", lwd = 2)
+
+```
+
+4. Plot the EOQ model in an appropriate range and add holding cost function and ordering cost function in different colors. Add a legend to the plot.
+
+```{r, exe5-4,  echo=T, include=T, collapse=TRUE}
+q.vec <- seq(265, 365, length.out = 100)
+y.vec <- cost_eoq_fun(q = q.vec , d = 100, cl = .1, co = 50)
+plot(q.vec, y.vec, xlab ="lot size q", ylab = "total cost", type = "l", lwd =2, ylim=c(12,max(y.vec)))
+abline(v = eoq_fun(d = 100, cl = .1, co = 50), col="darkgrey", lwd=2, lty=2)
+lines(x=q.vec, y=(1/2)*.1*q.vec, lwd=2, col="blue")
+lines(x=q.vec, y=(100/q.vec)*50, lwd=2, col="red")
+legend("left", lty = c(1,1,1,2), col = c("black","red","blue","darkgrey"), legend = c("total cost", "ordering cost", "storage cost", "optimal lot size"), bty="n" )
+```
 
 
+5. Consider the joint economic lot size model. Supplier and customer face  setup costs ($c^{sup.}_{set}$ ,$c^{cust.}_{set}$) as well as stock-holding cost rates ($c^{sup.}_{sh}$, $c^{sup.}_{sh}$). The demand rate of the customers is $\lambda$ and production rate of the supplier is $\mu$ (with $\lambda < \mu$). The cost functions of supplier and customer are
+$$C^{cust.}(q) = \frac{\lambda}{q} \cdot c^{cust.}_{set}  + c^{cust.}_{sh} \cdot  \frac{q}{2} $$ and
+$$C^{supp.}(q) = \frac{\lambda}{q} \cdot c^{sup.}_{set}  + c^{sup.}_{sh} \cdot  \frac{q}{2} \cdot \frac{\lambda}{\mu} . $$
+Plot the cost functions of supplier, customer, and the SC (i.e., total cost function) in different colors. Add a legend to the plot.
 
+```{r, exe5-5,  echo=T, include=T, collapse=TRUE}
+jel_func <- function(q, c.supp.set, c.supp.sh, c.cust.set, c.cust.sh, lambda, mu){
+  # costs in joint economic lot sizing model
+  if(lambda > mu) stop("infeasible (lambda > mu)") # check feasibility
+  c.cust <- lambda/q * c.cust.set  + c.cust.sh *  q/2 
+  c.supp <-  lambda/q * c.supp.set  + c.supp.sh * q/2 * lambda/mu
+  c.sc <- c.supp + c.cust
+  return(data.frame(cost.customer = c.cust, cost.supplier = c.supp, cost.sc = c.sc))
+}
+
+q.vec <- seq(50, 200, length.out = 100)
+y.df <- jel_func(q = q.vec, c.supp.set = 240, c.supp.sh = 4, c.cust.set = 100, c.cust.sh = 5, lambda = 100, mu = 160)
+
+plot(q.vec, y.df$cost.sc, xlab ="lot size q", ylab = "costs", type = "l", lwd = 2, ylim=range(y.df))
+lines(x = q.vec, y = y.df$cost.customer, lwd = 2, col = "blue")
+lines(x = q.vec, y = y.df$cost.supplier, lwd = 2, col = "red")
+abline(v = q.vec[which.min(y.df$cost.customer)], col = "blue", lwd = 1, lty = 2)
+abline(v = q.vec[which.min(y.df$cost.supplier)], col = "red", lwd = 1, lty = 2)
+abline(v = q.vec[which.min(y.df$cost.sc)], col = "darkgrey", lwd = 1, lty = 2)
+legend("top", lty = c(1,1,1,2), col = c("black","red","blue","darkgrey"), legend = c("SC", "supplier", "customer", "opt. q"), bty="n" , horiz = T)
+```
+
+6. Consider the contract design problem with buy-back option (Thonemann, 2010, p. 479). Given are unit cost per product unit $c$ of the supplier, the sales price of the supplier $w$, the sales price of retailer $r$, the scrap revenue $v$ of the SC as well as normally distributed demand with  $y \sim N(\mu, \sigma^2)$. To be determined is the buy-back price $b$ such that the optimal profit of the SC is generated. The optimal SC profit is obtained if the retailer orders $q=\mu + \sigma \cdot \Phi^{-1}\left( CR \right)$ units, whereby $CR = \frac{r-c}{r-v}$ is the SC's critical ratio.  For the optimizing buy-back price $b$ holds: $$ b(w) =-r \cdot \frac{c-v}{r-c} + w \cdot \frac{r-v}{r-c}$$. The profits of retailer and supplier in case of optimal combinations of $b$ and $w$ holds $$G^{ret.}(w)=(r-w) \cdot \mu - (r-b) \cdot \sigma \cdot \Phi^{-1}\left( CR \right)$$ and $$G^{sup.}(w)=(w-c) \cdot \mu - (b-v) \cdot \sigma \cdot \Phi^{-1}\left( CR \right).$$
+Plot the profit functions of retailer and supplier as well as the buy-back price function depending on $w$.
+
+```{r, exe5-6,  echo=T, include=T, collapse=TRUE}
+buy_back_func <- function(w, r, c, v, mu, sigma){
+  # costs & buy-back price in buy-back model
+  crit.rat.sc <- (r-c)/(r-v) # critical ratio SC
+  z.sc <- qnorm(crit.rat.sc)
+  b <- -(c-v)/(r-c)*r + (r-v)/(r-c)*w
+  profit.cust <- (r-w)*mu - (r-b)*dnorm(z.sc)* sigma
+  profit.supp <- (w-c)*mu - (b-v)*dnorm(z.sc)* sigma
+  return(data.frame(buy.back.price = b, profit.supplier = profit.supp, profit.cust = profit.cust, profit.sc = profit.cust+profit.supp ))
+}
+
+w.vec <- seq(150, 250, length.out = 100)
+y.df <- buy_back_func(w = w.vec, c = 100, r = 300, v = 10, mu = 100, sigma = 30)
+
+plot(w.vec, y.df$profit.sc, xlab ="price w", ylab = "profit", type = "l", lwd = 2, ylim=range(c(y.df$profit.supplier,y.df$profit.cust,y.df$profit.sc)))
+lines(x = w.vec, y = y.df$profit.cust, lwd = 2, col = "blue")
+lines(x = w.vec, y = y.df$profit.supplier, lwd = 2, col = "red")
+legend("bottomleft", col = c("black","red","blue"), lwd=2, legend = c("SC", "supplier", "customer"), bty="n")
+```
+
+7. Build a tidy data frame with `tibble()` containing two groups of observations: group A consisting of 100 observations with $x^A_i, y^A_i \sim \mathcal{N}(0,0.5)$ and group B consisting of 50 observations with $x^B_i, y^B_i \sim \mathcal{N}(3,1.5)$. Plot all points as a scatterplot and color the points groupwise.
+
+8. The data set above is untidy. Create the same data set in a tidy way and recreate the plots above.
+
+9. Alter the structured plot by connecting points by arrows. Test other smoothing methods offered by `geom_smooth`. Add three different smoothing functions to the plot.
+
+10. Create a random sample $S = S_1 \cup S_2$ consisting of 50 obersations with $S_1 \sim \mathcal{E}(0.5)$ and 20 observations with $S_2 \sim  \mathcal{N}(3, 1)$. Plot a histogram of the sample overlaid with the theoretical exponential and normal distribution. (Hint: Use `rexp()` to sample from the exponential distribution.)
+
+11. Plot the standard exponential distribution, mark 95%-quantile and highlight the area under the density curve beyond the 95%-quantile.
+
+12. Try to recreate these violine plots from an untidy data set.
 
