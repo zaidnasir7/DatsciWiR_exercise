@@ -2,9 +2,9 @@
 title: "Exercises Data Science with R"
 author: "Thomas Kirschstein"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
-  pdf_document: default
 ---
 
 # Chapter 1
@@ -183,7 +183,7 @@ z <- as.data.frame(z)
 z.sub <- z[, col(z) %% 3 == 0]
 ```
 
-3. Construct a matrix of size $6 \times 6$ and fill it by sampling numbers between 1 and 100. Retain indices of all entries ≤ 50.
+3. Construct a matrix of size $6 \times 6$ and fill it by sampling numbers between 1 and 100. Retain indices of all entries $\leq 50$.
 
 ```{r, exe4-3,  echo=T, include=T, collapse=TRUE}
 A <- matrix(sample(x = 1:100, 36), ncol = 6)
