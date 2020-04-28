@@ -1,7 +1,10 @@
 ---
 title: "Exercises Data Science with R"
-output: html_notebook
 author: "Thomas Kirschstein"
+output:
+  pdf_document: default
+  html_document:
+    df_print: paged
 ---
 
 # Chapter 1
@@ -35,6 +38,9 @@ cost_eoq_fun <- function(q, d, co, cl) {
   ((1/2)*cl*q)+((d/q)*co)
 }
 
+# test cost function
+cost_eoq_fun(d=100, q=20, cl = .1, co = 50)
+
 eoq_fun <- function(co, d, cl) {
   # return optimal lot size
   # d...demand
@@ -42,6 +48,10 @@ eoq_fun <- function(co, d, cl) {
   # cl...stock holding cost
   sqrt((2*co*d)/cl)
 }
+# optimal lot size
+q.star <-  eoq_fun(d = 100, cl = .1, co = 50)
+# optimal cost
+cost_eoq_fun(d=100, q=q.star, cl = .1, co = 50)
 ```
 
 2. Derive a function for calculating weighted Euclidean distance between two points.
@@ -52,15 +62,20 @@ weuc_d2_func <- function(x,y,w) {
   # w.. weight vector
   sqrt(sum(w*(x-y)^2))
 }
-
+# test distacne function
+weuc_d2_func(x = c(1,2,3), y= c(3,2,1), w=c(1,1,1) )
+# result should be sqrt(8)
 ```
 
 3. Formulate a function for the Geometric Poisson density distribution.
 ```{r, exe2-3,  echo=T, include=T, collapse=TRUE}
-pois_fun <- function(n, theta, lambda) {
-  # calculates density of Geometric Poisson distribution
-  # n...frequency
-  # lambda, theta...parameters
-  sum(exp(-lambda)*lambda^(1:n)/factorial(1:n)*(1-theta)^(n-1:n)*choose(n-1,0:(n-1)))
+geom_pois_dens_fun <- function(n, lambda, theta){
+  # calculates density value of geometric Poisson distribution
+  # n...integer, demand/successes, theta,lambda..parameters
+  k.vec <- 1:n
+  sum(exp(-lambda)*lambda^k.vec/factorial(k.vec)*(1-theta)^(n-k.vec)*choose(n-1, k.vec-1))
 }
+# test function
+geom_pois_dens_fun(n=3, lambda=.5, theta = 2)
+
 ```
