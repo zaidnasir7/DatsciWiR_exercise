@@ -1,0 +1,210 @@
+---
+title: "Exercises Data Science with R"
+author: "Thomas Kirschstein"
+output:
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+# Chapter 1
+
+There are quite a lot standard basic mathematical functions. Try to google for R cheat sheets if you are interested in a comprehensive overview.
+
+```{r, exe1, echo=T, include=T, collapse=TRUE}
+3^2     #1
+sqrt(9) #2
+9^.5
+pi^2    #3
+(abs(3^2-4^2))^.5 #4
+log(exp(4), base = exp(1)) #5
+log(exp(4))
+log(100, base = 10) #6
+log10(100) 
+factorial(8) #7
+exp(factorial(3)) #8
+```
+
+# Chapter 2
+
+The chapter intends to focus on writing simple functions in R.  
+
+1. Formulate the EOQ formula in R
+```{r, exe2-1,  echo=T, include=T, collapse=TRUE}
+cost_eoq_fun <- function(q, d, co, cl) {
+  # returns total cost per period
+  # d...demand
+  # q...lot size
+  # co...ordering cost
+  # cl...stock holding cost
+  ((1/2)*cl*q)+((d/q)*co)
+}
+
+# test cost function
+cost_eoq_fun(d=100, q=20, cl = .1, co = 50)
+
+eoq_fun <- function(co, d, cl) {
+  # return optimal lot size
+  # d...demand
+  # co...ordering cost
+  # cl...stock holding cost
+  sqrt((2*co*d)/cl)
+}
+# optimal lot size
+q.star <-  eoq_fun(d = 100, cl = .1, co = 50)
+# optimal cost
+cost_eoq_fun(d=100, q=q.star, cl = .1, co = 50)
+```
+
+2. Derive a function for calculating weighted Euclidean distance between two points.
+```{r, exe2-2,  echo=T, include=T, collapse=TRUE}
+weuc_d2_func <- function(x,y,w) {
+  # calculates weighted Euclidean distance between x and y
+  # y,x...vectors
+  # w.. weight vector
+  sqrt(sum(w*(x-y)^2))
+}
+# test distacne function
+weuc_d2_func(x = c(1,2,3), y= c(3,2,1), w=c(1,1,1) )
+# result should be sqrt(8)
+```
+
+3. Alter your EOQ function by checking whether all arguments are supplied and stop execution while displaying a error message.
+-> postponed
+
+4. Formulate a function for the Geometric Poisson density distribution.
+```{r, exe2-3,  echo=T, include=T, collapse=TRUE}
+geom_pois_dens_fun <- function(n, lambda, theta){
+  # calculates density value of geometric Poisson distribution
+  # n...integer, demand/successes, theta,lambda..parameters
+  k.vec <- 1:n
+  sum(exp(-lambda)*lambda^k.vec/factorial(k.vec)*(1-theta)^(n-k.vec)*choose(n-1, k.vec-1))
+}
+# test function
+geom_pois_dens_fun(n=3, lambda=.5, theta = 2)
+
+```
+
+
+# Chapter 3
+
+Basics on data types and data manipulation
+
+1. Calculate the outer product of two vectors (without outer())
+```{r, exe3-1,  echo=T, include=T, collapse=TRUE}
+x <- 1:5
+y <- 10:6
+as.matrix(x) %*% t(as.matrix(y))
+```
+
+
+2. Define a function that calculates the trace of a matrix.
+```{r, exe3-2,  echo=T, include=T, collapse=TRUE}
+trace_func <- function(z){
+  # calculates trace of z
+  # z...matrix
+  sum(diag(z))
+} 
+A <- matrix(rnorm(9) , ncol=3)
+trace_func(A)
+```
+
+
+3.Create a vector containing the first 100 Fibonacci numbers.
+Most commonly, the Fibonacci numbers are defined recursively by $F_n=F_{n-1}+F_{n-2}$ whereby $F_0 =0$ and $F_1=1$. However, there is also an explicit formulation: $F_n = \sum_{k=0}^{\lfloor \frac{n-1}{2} \rfloor} \binom{n-k-1}{k}$ (ceck [here](https://en.wikipedia.org/wiki/Fibonacci_number#Mathematics))
+
+```{r, exe3-3,  echo=T, include=T, collapse=TRUE}
+fib_num_fun <- function(n){
+  # calculate nth Fibonacci number
+  # n...number
+  k.vec <- 0:floor((n-1)/2)
+  sum(choose(n-k.vec-1, k.vec))
+}
+# vectorize fib_num_fun such that it accepts input vectors
+vfib_num_fun <- Vectorize(fib_num_fun)
+# doesn't work
+fib_num_fun(1:100)
+# works
+vfib_num_fun(1:100)
+```
+
+4. Create a matrix containing the all binominal coefficients up to n = 50
+```{r, exe3-4,  echo=T, include=T, collapse=TRUE}
+pas <- outer(1:50, 1:50, choose)
+```
+
+5. Preference matrices in the Analystical Hirachy Process (AHP) show a form of (inverted) symmetry. How can you check this in R
+
+The AHP method requires for a matrix $A=\{a_{ij}|i,j=1,...,n\}$ that $a_{i,j} = \frac{1}{a_{j,i}}$. Thereby, diagonal elements are always 1 (i.e., $a_{ii} = 1$)
+
+```{r, exe3-5,  echo=T, include=T, collapse=TRUE}
+# create 3x3 matrix 
+A <- matrix(sample(1:10 , 9), ncol=3)
+# diagonals to 1
+diag(A) <- 1
+# checks matrix elementwise
+A == t(1/A) # -> problem double counting of elements
+# Alternative: compare just elements of triangle sub-matrices
+A[lower.tri(A)] == 1/A[upper.tri(A)]
+```
+
+6. Calculate the synthesis of an AHP preference matrix
+
+The synthesis is calculated in two steps: 
+(a) normalizing $A$ by dividing with column sums
+(b) calculate row means of normalized matrix 
+
+```{r, exe3-6,  echo=T, include=T, collapse=TRUE}
+# convert A (chunk before) into a consistent matrix
+A[lower.tri(A)] <- 1/A[upper.tri(A)]
+# step (a) of synthesis
+dev <- colSums(A) # calculate colSums
+A.prime <- t(t(A) / dev) # Alternative a: using that R divides columnwise
+A.prime <- A %*% diag(1 / dev) # Alternative b: use matrix calculation
+# step (b) of synthesis
+rowMeans(A.prime)
+```
+
+# Chapter 4
+
+
+1. Construct a list with 100 entries. Afterwards, display only entries with odd indices.
+```{r, exe4-1,  echo=T, include=T, collapse=TRUE}
+x <- sample(x = 1:100, size = 100)
+l1 <- as.list(x)
+l1.odd <- l1[1:100 %% 2 == 1]
+```
+
+
+2. Construct a tibble or data frame consisting of 100 columns and 1 row. Extract only every 3rd column.
+```{r, exe4-2,  echo=T, include=T, collapse=TRUE}
+z <- matrix(sample(x = 1:1000, size = 100), nrow=1)
+z <- as.data.frame(z)
+z.sub <- z[, col(z) %% 3 == 0]
+```
+
+3. Construct a matrix of size $6 \times 6$ and fill it by sampling numbers between 1 and 100. Retain indices of all entries ≤ 50.
+
+```{r, exe4-3,  echo=T, include=T, collapse=TRUE}
+A <- matrix(sample(x = 1:100, 36), ncol = 6)
+which(A <= 50)
+```
+
+4.Formulate a function for calculating the moving average over a vector.
+
+```{r, exe4-4,  echo=T, include=T, collapse=TRUE}
+ma_fun <- function(x, n){
+  # calculates moving average
+  # x...vector to be averaged, n...time window width
+  cx <- c(0,cumsum(x))
+  (cx[(n+1):length(cx)] - cx[1:(length(cx) - n)]) / n
+}
+# test function
+ma_fun(x = 1:10 , n=4)
+```
+
+
+
+
+
+
