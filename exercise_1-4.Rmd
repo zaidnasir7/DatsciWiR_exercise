@@ -2,12 +2,12 @@
 title: "Exercises Data Science with R"
 author: "Thomas Kirschstein"
 output:
-  pdf_document: default
   html_document:
     df_print: paged
     toc: yes
     toc_float: true
     number_sections: false
+  pdf_document: default
 ---
 
 # Chapter 1
@@ -303,14 +303,31 @@ buy_back_func <- function(w, r, c, v, mu, sigma){
 
 w.vec <- seq(150, 250, length.out = 100)
 y.df <- buy_back_func(w = w.vec, c = 100, r = 300, v = 10, mu = 100, sigma = 30)
-
+par(mar = c(4, 4, .1, 4) )
 plot(w.vec, y.df$profit.sc, xlab ="price w", ylab = "profit", type = "l", lwd = 2, ylim=range(c(y.df$profit.supplier,y.df$profit.cust,y.df$profit.sc)))
 lines(x = w.vec, y = y.df$profit.cust, lwd = 2, col = "blue")
 lines(x = w.vec, y = y.df$profit.supplier, lwd = 2, col = "red")
-legend("bottomleft", col = c("black","red","blue"), lwd=2, legend = c("SC", "supplier", "customer"), bty="n")
+# second axis
+par(new=T)
+# data without axis
+plot(w.vec, y.df$buy.back.price, xaxt = "n", yaxt = "n", ylab="", xlab = "", type = "l", lwd = 2, col = "darkgrey", lty = 2)
+# add axis 
+axis(4)
+# add label
+mtext( "Buy back price b", side  = 4, line = 2)
+legend("bottomleft", col = c("black","red","blue", "darkgrey"), lty=c(1,1,1,2), lwd=2, legend = c("SC", "supplier", "customer","buy-back price"), bty="n")
 ```
 
 7. Build a tidy data frame with `tibble()` containing two groups of observations: group A consisting of 100 observations with $x^A_i, y^A_i \sim \mathcal{N}(0,0.5)$ and group B consisting of 50 observations with $x^B_i, y^B_i \sim \mathcal{N}(3,1.5)$. Plot all points as a scatterplot and color the points groupwise.
+
+```{r, exe5-7,  echo=T, include=T, collapse=TRUE}
+library(tidyverse)
+dtib <- tibble(group = c(rep("A",50),rep("B",50)), x.values = c(rnorm(50, mean = 0, sd = sqrt(0.5)), rnorm(50, mean = 3, sd = sqrt(1.5))), y.values = c(rnorm(50, mean = 0, sd = sqrt(0.5)), rnorm(50, mean = 3, sd = sqrt(1.5))))
+ggplot(data = dtib, aes(x = x.values, y = y.values, col = group)) + geom_point() + ylab("y") + xlab("x")
+# Alternative (over-tidy)
+dtib <- tibble(group = c(rep("A",100),rep("B",100)), coord = rep(c("x","y"), 100), values = c(rnorm(100, mean = 0, sd = sqrt(0.5)), rnorm(100, mean = 3, sd = sqrt(1.5))))
+qplot(x = dtib$values[dtib$coord == "x"], y = dtib$values[dtib$coord == "y"], col = dtib$group[dtib$coord == "x"], xlab = "x", ylab="y")  
+```
 
 8. The data set above is untidy. Create the same data set in a tidy way and recreate the plots above.
 
