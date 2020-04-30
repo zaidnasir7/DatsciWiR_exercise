@@ -333,6 +333,27 @@ qplot(x = dtib$values[dtib$coord == "x"], y = dtib$values[dtib$coord == "y"], co
 
 9. Alter the structured plot by connecting points by arrows. Test other smoothing methods offered by `geom_smooth`. Add three different smoothing functions to the plot.
 
+```{r, exe5-9,  echo=T, include=T, collapse=TRUE}
+n <- 50                                 # number of points to plot
+x <- rnorm(n, 20 , 7)                   # independent x coordinates
+y <- 2*x + rnorm(n, 0, x^0.75)          # dependent variable
+z <- 0.125*x^2 - x + rnorm(n, 0, 3)     #  dependent variable 
+dat <- tibble(x = x, y = y, z = z)      # build an untidy tibble with x, y and z
+# one large arrow - generalized additive model fit
+ggplot(data = dat, mapping = aes(x = x[order(x)], y = y[order(x)]) ) + 
+  geom_point() +  
+  geom_path(arrow = arrow()) +
+  geom_smooth(method = "gam") +
+  labs(x = "x", y = "y") 
+# multiple arrow - generalized linear model with quadratic trend
+ggplot(data = dat, mapping = aes(x = x[order(x)], y = z[order(x)]) ) + 
+  geom_point() +  
+  geom_segment(aes(xend = dplyr::lead(x[order(x)]), yend = dplyr::lead(z[order(x)])),
+               arrow = arrow(type = "open", angle = 30, length = unit(0.1, "inches"))) +
+  geom_smooth(method = "glm", formula = y ~ poly(x,2) ) +
+  labs(x = "x", y = "y") 
+```
+
 10. Create a random sample $S = S_1 \cup S_2$ consisting of 50 obersations with $S_1 \sim \mathcal{E}(0.5)$ and 20 observations with $S_2 \sim  \mathcal{N}(3, 1)$. Plot a histogram of the sample overlaid with the theoretical exponential and normal distribution. (Hint: Use `rexp()` to sample from the exponential distribution.)
 
 11. Plot the standard exponential distribution, mark 95%-quantile and highlight the area under the density curve beyond the 95%-quantile.
