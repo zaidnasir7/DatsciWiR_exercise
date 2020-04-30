@@ -1,0 +1,44 @@
+---
+title: "Exercises project"
+author: "Thomas Kirschstein"
+output:
+  html_document:
+    df_print: paged
+---
+
+# Data description 
+
+The data set "biathlon_results_women.csv" contains results of all womens' biathlon races of the IBU World Cup, the World Championships, and at the Olympic Games from season 2008/09 till 2017/18.  The raw data is extracted from [IBU results homepage](https://biathlonresults.com/) where also a description of the variables is provided.
+
+The data set contains 25 variables as follows
+
+name | description
+------------- | -------------
+date	| race date in d.m.year format
+season	| season id
+competition	| Type of competition (I...Individual, S...Sprint, M...Mass start, P...Pursuit)
+type	| Type of race (W...world Cup, O...Olympic, C...World Championship)
+name	| Name of athlete
+nation	| nation of athlete
+rank	| final rank (total time)
+course.rank	| final rank (course time)
+tot.time	| total time at finish (in seconds)
+course.time	| course time at finish (in seconds)
+location	| race location
+elevation	| elevation of location (in m)
+height.diff	| height difference of course profile (in m)
+max.climb	| maximum climb in course profile (in m)
+total.climb	| total climb over course (in m)
+birthday	| birthday of athlete
+snow.conditions	| snow conditions (check IBU website, [wiki](https://en.wikipedia.org/wiki/Classifications_of_snow), [blog](http://blog.tahoemountainsports.com/tahoe-cross-country-skiing-well-its-about-time/))
+snow.temperature	| snow temperature (in $^\circ$C)
+air.temperature	| air temperature (in $^\circ$C)
+weather.conditions	| weather conditions (self-explaining)
+fails.total	| total number of missed targets in shooting
+speed	| skiing speed, i.e. course length/course time (in m/s)
+age	| age of athlete at race time (in years)
+home	| whether it was a home race
+
+# Task
+
+Compose a report with a descriptive analysis of the data. Investigate which variables affect the skiing speed of the athletes. Use basic statistics as well as appropriate plots to illustrate the effects of environmental conditions or course profiles on skiing speed. 
