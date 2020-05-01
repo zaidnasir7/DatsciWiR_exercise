@@ -2,12 +2,12 @@
 title: "Exercises Data Science with R"
 author: "Thomas Kirschstein"
 output:
+  pdf_document: default
   html_document:
     df_print: paged
     toc: yes
     toc_float: true
     number_sections: false
-  pdf_document: default
 ---
 
 # Chapter 1
@@ -385,9 +385,3 @@ ggplot(data = data.frame(x = 0:10) , aes(x = x)) +              # set up plot
 12. Try to recreate these violine plots from an untidy data set.
 
 -> postponed
-
-
-
-
-12. Try to recreate these violine plots from an untidy data set.
-
