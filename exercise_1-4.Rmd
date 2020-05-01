@@ -212,7 +212,7 @@ ma_fun(x = 1:10 , n=4)
 $$ y = \sin(3 \cdot x^2 - 4) \cdot x + 0.5 \cdot x + \epsilon $$ whereby $\epsilon \sim N(0,0.5)$.
 Can you estimate a regression function?
 
-```{r, exe5-1,  echo=T, include=T, collapse=TRUE}
+```{r, exe5-1,  echo=T, include=T, collapse=TRUE, warnings = FALSE, message = FALSE}
 n <- 100                                # number of points to plot
 x <- runif(n, min=-3, max=3)            # 100 x coordinates
 y <- sin(3 * x^2 - 4) * x + 0.5 * x + rnorm(n, mean = 0, sd = sqrt(.5)) 
@@ -223,7 +223,7 @@ abline(lin.reg, col = "red", lwd =2)    # ... and plot the regression line
 
 2. Plot the EOQ model in an appropriate range.
 
-```{r, exe5-2,  echo=T, include=T, collapse=TRUE}
+```{r, exe5-2,  echo=T, include=T, collapse=TRUE, warnings = FALSE, message = FALSE}
 q.vec <- seq(265, 365, length.out = 100)
 y.vec <- cost_eoq_fun(q = q.vec , d = 100, cl = .1, co = 50)
 plot(q.vec, y.vec, xlab ="lot size q", ylab = "total cost", type = "l", lwd =2)
@@ -236,7 +236,7 @@ The total cost in the normal newsvendor model is given by
 $$ Z(q) = \left(c_u + c_o \right) \cdot \sigma \cdot \left( \varphi(q') + q' \cdot \Phi(q') \right) - c_u \cdot (q-\mu) $$ 
 with $q' = \frac{q-\mu}{\sigma}$
 
-```{r, exe5-3,  echo=T, include=T, collapse=TRUE}
+```{r, exe5-3,  echo=T, include=T, collapse=TRUE, warnings = FALSE, message = FALSE}
 newsven_obj_fun <- function(x, cu, co, mu, sigma){
       q.prime <- (x-mu)/sigma
 	     (cu + co) * sigma * (dnorm(q.prime) + q.prime * pnorm(q.prime)) - cu * sigma * q.prime
@@ -249,7 +249,7 @@ plot(q.vec, cost.vec, xlab ="lot size q", ylab = "total cost", type = "l", lwd =
 
 4. Plot the EOQ model in an appropriate range and add holding cost function and ordering cost function in different colors. Add a legend to the plot.
 
-```{r, exe5-4,  echo=T, include=T, collapse=TRUE}
+```{r, exe5-4,  echo=T, include=T, collapse=TRUE, warnings = FALSE, message = FALSE}
 q.vec <- seq(265, 365, length.out = 100)
 y.vec <- cost_eoq_fun(q = q.vec , d = 100, cl = .1, co = 50)
 plot(q.vec, y.vec, xlab ="lot size q", ylab = "total cost", type = "l", lwd =2, ylim=c(12,max(y.vec)))
@@ -265,7 +265,7 @@ $$C^{cust.}(q) = \frac{\lambda}{q} \cdot c^{cust.}_{set}  + c^{cust.}_{sh} \cdot
 $$C^{supp.}(q) = \frac{\lambda}{q} \cdot c^{sup.}_{set}  + c^{sup.}_{sh} \cdot  \frac{q}{2} \cdot \frac{\lambda}{\mu} . $$
 Plot the cost functions of supplier, customer, and the SC (i.e., total cost function) in different colors. Add a legend to the plot.
 
-```{r, exe5-5,  echo=T, include=T, collapse=TRUE}
+```{r, exe5-5,  echo=T, include=T, collapse=TRUE, warnings = FALSE, message = FALSE}
 jel_func <- function(q, c.supp.set, c.supp.sh, c.cust.set, c.cust.sh, lambda, mu){
   # costs in joint economic lot sizing model
   if(lambda > mu) stop("infeasible (lambda > mu)") # check feasibility
@@ -290,7 +290,7 @@ legend("top", lty = c(1,1,1,2), col = c("black","red","blue","darkgrey"), legend
 6. Consider the contract design problem with buy-back option (Thonemann, 2010, p. 479). Given are unit cost per product unit $c$ of the supplier, the sales price of the supplier $w$, the sales price of retailer $r$, the scrap revenue $v$ of the SC as well as normally distributed demand with  $y \sim N(\mu, \sigma^2)$. To be determined is the buy-back price $b$ such that the optimal profit of the SC is generated. The optimal SC profit is obtained if the retailer orders $q=\mu + \sigma \cdot \Phi^{-1}\left( CR \right)$ units, whereby $CR = \frac{r-c}{r-v}$ is the SC's critical ratio.  For the optimizing buy-back price $b$ holds: $$ b(w) =-r \cdot \frac{c-v}{r-c} + w \cdot \frac{r-v}{r-c}$$. The profits of retailer and supplier in case of optimal combinations of $b$ and $w$ holds $$G^{ret.}(w)=(r-w) \cdot \mu - (r-b) \cdot \sigma \cdot \Phi^{-1}\left( CR \right)$$ and $$G^{sup.}(w)=(w-c) \cdot \mu - (b-v) \cdot \sigma \cdot \Phi^{-1}\left( CR \right).$$
 Plot the profit functions of retailer and supplier as well as the buy-back price function depending on $w$.
 
-```{r, exe5-6,  echo=T, include=T, collapse=TRUE}
+```{r, exe5-6,  echo=T, include=T, collapse=TRUE, warnings = FALSE, message = FALSE}
 buy_back_func <- function(w, r, c, v, mu, sigma){
   # costs & buy-back price in buy-back model
   crit.rat.sc <- (r-c)/(r-v) # critical ratio SC
@@ -311,16 +311,14 @@ lines(x = w.vec, y = y.df$profit.supplier, lwd = 2, col = "red")
 par(new=T)
 # data without axis
 plot(w.vec, y.df$buy.back.price, xaxt = "n", yaxt = "n", ylab="", xlab = "", type = "l", lwd = 2, col = "darkgrey", lty = 2)
-# add axis 
-axis(4)
-# add label
-mtext( "Buy back price b", side  = 4, line = 2)
+axis(4) # add axis 
+mtext( "Buy back price b", side  = 4, line = 2)  # add label
 legend("bottomleft", col = c("black","red","blue", "darkgrey"), lty=c(1,1,1,2), lwd=2, legend = c("SC", "supplier", "customer","buy-back price"), bty="n")
 ```
 
 7. Build a tidy data frame with `tibble()` containing two groups of observations: group A consisting of 100 observations with $x^A_i, y^A_i \sim \mathcal{N}(0,0.5)$ and group B consisting of 50 observations with $x^B_i, y^B_i \sim \mathcal{N}(3,1.5)$. Plot all points as a scatterplot and color the points groupwise.
 
-```{r, exe5-7,  echo=T, include=T, collapse=TRUE}
+```{r, exe5-7,  echo=T, include=T, collapse=TRUE, warnings = FALSE, message = FALSE}
 library(tidyverse)
 dtib <- tibble(group = c(rep("A",50),rep("B",50)), x.values = c(rnorm(50, mean = 0, sd = sqrt(0.5)), rnorm(50, mean = 3, sd = sqrt(1.5))), y.values = c(rnorm(50, mean = 0, sd = sqrt(0.5)), rnorm(50, mean = 3, sd = sqrt(1.5))))
 ggplot(data = dtib, aes(x = x.values, y = y.values, col = group)) + geom_point() + ylab("y") + xlab("x")
@@ -331,9 +329,11 @@ qplot(x = dtib$values[dtib$coord == "x"], y = dtib$values[dtib$coord == "y"], co
 
 8. The data set above is untidy. Create the same data set in a tidy way and recreate the plots above.
 
+-> postponed
+
 9. Alter the structured plot by connecting points by arrows. Test other smoothing methods offered by `geom_smooth`. Add three different smoothing functions to the plot.
 
-```{r, exe5-9,  echo=T, include=T, collapse=TRUE}
+```{r, exe5-9,  echo=T, include=T, collapse=TRUE, warnings = FALSE, message = FALSE}
 n <- 50                                 # number of points to plot
 x <- rnorm(n, 20 , 7)                   # independent x coordinates
 y <- 2*x + rnorm(n, 0, x^0.75)          # dependent variable
@@ -354,9 +354,40 @@ ggplot(data = dat, mapping = aes(x = x[order(x)], y = z[order(x)]) ) +
   labs(x = "x", y = "y") 
 ```
 
-10. Create a random sample $S = S_1 \cup S_2$ consisting of 50 obersations with $S_1 \sim \mathcal{E}(0.5)$ and 20 observations with $S_2 \sim  \mathcal{N}(3, 1)$. Plot a histogram of the sample overlaid with the theoretical exponential and normal distribution. (Hint: Use `rexp()` to sample from the exponential distribution.)
+10. Create a random sample $S = S_1 \cup S_2$ consisting of 50 observations with $S_1 \sim \mathcal{E}(0.5)$ and 20 observations with $S_2 \sim  \mathcal{N}(3, 1)$. Plot a histogram of the sample overlaid with the theoretical exponential and normal distribution. (Hint: Use `rexp()` to sample from the exponential distribution.)
+
+```{r, exe5-10,  echo=T, include=T, collapse=TRUE, warnings = FALSE, message = FALSE, error=FALSE}
+s.1 <- rexp(50, 0.5)                  # sample 1
+s.2 <- rnorm(20, 3, 1)                # sample 2
+s <- c(s.1, s.2)                      # combined sample
+dat <- tibble(x = s)                  # tibble
+
+col.vec <- c("theor. exp. density" = "red", "theor. normal density" = "orange", "est. density" = "blue") # set color vector
+ggplot(dat , aes(x = x)) +              # set up plot
+geom_histogram(binwidth = 1/3, aes(y=..density..), colour="black") + # plot density histogram, default is frequency
+  stat_function(fun = dnorm, args = list(mean = 3, sd = 1), mapping = aes(colour = "theor. normal density"), xlim = c(0, 10)) +  # add theoretical norm density
+  stat_function(fun = dexp, args = list(rate = 0.5), mapping = aes(colour = "theor. exp. density"), xlim = c(0, 10)) +  # add theoretical density
+  scale_colour_manual(name="Densities",values = col.vec) + # define legend structure
+  theme(legend.position = "right")                         # add legend
+```
 
 11. Plot the standard exponential distribution, mark 95%-quantile and highlight the area under the density curve beyond the 95%-quantile.
+
+```{r, exe5-11,  echo=T, include=T, collapse=TRUE, warnings = FALSE, message = FALSE, error=FALSE}
+q95 <- qexp(0.95) 
+ggplot(data = data.frame(x = 0:10) , aes(x = x)) +              # set up plot
+  stat_function(fun = dexp, args = list(rate = 1)) +           # add density
+  geom_segment(aes(x = q95, y = 0, xend = q95, yend = 1), size = 1.25, color = "grey", linetype ="dashed") + # add vertical line
+  stat_function(fun = dexp, args = list(rate = 1), xlim = c(q95, 10),  geom = "area") + # add 5%-area 
+  annotate(geom="text", x=q95, y=1, label=paste("95%-quantile =", round(q95,2)))              # annotate 95%-quantile
+```
+
+12. Try to recreate these violine plots from an untidy data set.
+
+-> postponed
+
+
+
 
 12. Try to recreate these violine plots from an untidy data set.
 
