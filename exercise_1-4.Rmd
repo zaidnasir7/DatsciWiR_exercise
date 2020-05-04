@@ -2,12 +2,12 @@
 title: "Exercises Data Science with R"
 author: "Thomas Kirschstein"
 output:
-  pdf_document: default
   html_document:
     df_print: paged
     toc: yes
     toc_float: true
     number_sections: false
+  pdf_document: default
 ---
 
 # Chapter 1
@@ -98,6 +98,7 @@ Basics on data types and data manipulation
 x <- 1:5
 y <- 10:6
 as.matrix(x) %*% t(as.matrix(y))
+outer(x,y)
 ```
 
 
@@ -108,7 +109,8 @@ trace_func <- function(z){
   # z...matrix
   sum(diag(z))
 } 
-A <- matrix(rnorm(9) , ncol=3)
+tmp <- rnorm(9)
+A <- matrix(tmp, ncol=3, byrow = T)
 trace_func(A)
 ```
 
@@ -126,17 +128,17 @@ fib_num_fun <- function(n){
 # vectorize fib_num_fun such that it accepts input vectors
 vfib_num_fun <- Vectorize(fib_num_fun)
 # doesn't work
-fib_num_fun(1:100)
+fib_num_fun(1:10)
 # works
 vfib_num_fun(1:100)
 ```
 
 4. Create a matrix containing the all binominal coefficients up to n = 50
 ```{r, exe3-4,  echo=T, include=T, collapse=TRUE}
-pas <- outer(1:50, 1:50, choose)
+pas <- outer(1:10, 1:10, choose)
 ```
 
-5. Preference matrices in the Analystical Hirachy Process (AHP) show a form of (inverted) symmetry. How can you check this in R
+5. Preference matrices in the Analytical Hierachy Process (AHP) show a form of (inverted) symmetry. How can you check this in R?
 
 The AHP method requires for a matrix $A=\{a_{ij}|i,j=1,...,n\}$ that $a_{i,j} = \frac{1}{a_{j,i}}$. Thereby, diagonal elements are always 1 (i.e., $a_{ii} = 1$)
 
@@ -175,6 +177,7 @@ rowMeans(A.prime)
 x <- sample(x = 1:100, size = 100)
 l1 <- as.list(x)
 l1.odd <- l1[1:100 %% 2 == 1]
+l1.odd <- l1[seq(1, 100, by = 2)]
 ```
 
 
@@ -204,7 +207,6 @@ ma_fun <- function(x, n){
 # test function
 ma_fun(x = 1:10 , n=4)
 ```
-
 
 # Chapter 5
 
@@ -244,7 +246,6 @@ newsven_obj_fun <- function(x, cu, co, mu, sigma){
 q.vec <- seq(110, 125, length.out = 100)
 cost.vec <- newsven_obj_fun(x = q.vec , mu = 100, cu = 2, co = 0.5, sigma = 20)
 plot(q.vec, cost.vec, xlab ="lot size q", ylab = "total cost", type = "l", lwd = 2)
-
 ```
 
 4. Plot the EOQ model in an appropriate range and add holding cost function and ordering cost function in different colors. Add a legend to the plot.

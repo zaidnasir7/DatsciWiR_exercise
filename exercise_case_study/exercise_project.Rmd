@@ -42,3 +42,19 @@ home	| whether it was a home race
 # Task
 
 Compose a report with a descriptive analysis of the data. Investigate which variables affect the skiing speed of the athletes. Use basic statistics as well as appropriate plots to illustrate the effects of environmental conditions or course profiles on skiing speed. 
+
+# Read data 
+
+At first read the data set into the workspace either via the console or the "import dataset" dialog in environment menu (right upper pane). 
+
+```{r, proj-1, echo=TRUE, warning=TRUE, collapse=TRUE}
+biathlon_results_women <- read.csv("~/Thomas/Owncloud/Data_Science_PL/R-Skripte/DatsciWiR_exercise/exercise_case_study/biathlon_results_women.csv")
+```
+
+The data should look like this:
+
+```{r, proj-2, echo=TRUE, warning=TRUE, collapse=TRUE}
+library(DT)
+datatable(head(biathlon_results_women, 50))
+```
+
