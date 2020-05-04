@@ -1,0 +1,143 @@
+#Chapter 1 (Exercise)
+```{r}
+3^2
+sqrt(9)
+pi^2
+sqrt(abs(3^2-4^2))
+log(exp(4))
+log10(100)
+factorial(8)
+exp(factorial(3))
+```
+#Chapter 2(Exercise)
+1)
+```{r}
+cost_eoq_fun <- function(d,q,cl,co){
+  #returns total demand of EOQ
+  #d=demand
+  #q=quantity
+  #cl=holding cost
+  #co=Ordering cost 
+  1/2*cl*q+d/q*co
+}
+#test cost function 
+cost_eoq_fun(d=100,q=40,cl=0.5,co=20)
+```
+2)
+```{r}
+weuc_d2_func <- function(x,y,w)
+{
+#x,y= coordiates
+#w= weight
+sqrt(sum(w*(x-y)^2))
+}
+#test distance funtion
+weuc_d2_func(x=c(1,2,3), y=c(3,2,1), w=c(1,1,1))
+
+```
+4)
+```{r}
+geom_pois_dens_fun <- function(n, lambda, theta){
+  #calculates geometric poison distribution
+  #n=integer 
+  k.vec <- 1:n
+  sum(exp(-lambda)*lambda^k.vec/factorial(k.vec)*(1-theta)^(n-k.vec)*choose(n-1,k.vec-1))
+}
+#test function 
+geom_pois_dens_fun(n=3, lambda = 0.5, theta = 2)
+```
+#Chapter 3
+1)
+```{r}
+#calculate the outer product of two vectors with outer()
+x <- 1:5
+y <- 10:6
+as.matrix(x) %*% t(as.matrix(y))
+outer(x,y)
+```
+2)
+```{r}
+#define a function that calculates a trace of matrix 
+trace_func <- function(z){
+  #calculates a trace of matrix 
+  #z, matrix 
+  sum(diag(z))
+}
+tmp <- rnorm(9)
+A <- matrix(tmp, ncol=3, byrow = T)
+trace_func(A)
+```
+3)
+```{r}
+#Create a vector containing the first 100 Fibonacci numbers
+fib_num_func <- function(n){
+  #calculate nth fibonacci number 
+  #n total number 
+  k.vec <- 0:floor((n-1/2))
+  sum(choose(n-k.vec-1, k.vec))
+  #vectorize fibbonacci number such that it accepts input vectors 
+  vfib_num_func <- Vectorize(fib_num_func)
+  fib_num_func(1:10)
+  vfib_num_func(1:100)
+}
+```
+4)
+```{r}
+#Create a matrix containing the all binomial coefficients up to n=50
+matrix_new <- matrix(2:3, ncol=2, nrow = 3){
+  binomial(n=50)
+}
+```
+5)
+```{r}
+#Preference matrices in the Analytical Hierachy Process (AHP) show a form of (inverted) symmetry. How can you check this in R?
+A <- matrix(sample(1:10,9),ncol = 3)
+diag(A)<- 1
+A==t(1/A)
+A[lower.tri(A)] == A[upper.tri(1/A)]
+```
+6)
+```{r}
+#Calculate the synthesis of an AHP preference matrix
+A[lower.tri(A)] ==1/A[upper.tri(A)]
+dev <- colSums(A)
+A.prime <- t(t(A))/dev
+```
+#Chapter 4
+1)
+```{r}
+#Construct a list with 100 entries. Afterwards, display only entries with odd indices
+x <- sample(x=1:100, size =100)
+l1<- as.list(x)
+l1.odd <- l1[1:100 %% 2 == 1]
+l1.odd <- l1[seq(1, 100, by = 2)]
+```
+2)
+```{r}
+#Construct a tibble or data frame consisting of 100 columns and 1 row. Extract only every 3rd column
+z <- matrix(sample(x = 1:1000, size = 100), nrow=1)
+z <- as.data.frame(z)
+z.sub <- z[, col(z) %% 3 == 0]
+```
+3)
+```{r}
+#Construct a matrix of size 6×6 and fill it by sampling numbers between 1 and 100. Retain indices of all entries ≤50
+A <- matrix(sample(x = 1:100, 36), ncol = 6)
+which(A <= 50)
+```
+4)
+```{r}
+#Formulate a function for calculating the moving average over a vector
+movavg_func <- funtion(x,n) {
+#calculates moving average 
+#x vector 
+cx <- c(0,cumsum(x))
+ (cx[(n+1):length(cx)] - cx[1:(length(cx) - n)]) / n
+}
+#test function
+movavg_func(x=1:10, n=10)
+```
+
+
+```{r}
+```
